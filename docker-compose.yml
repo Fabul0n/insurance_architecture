@@ -1,0 +1,49 @@
+services:
+  web:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: insurance_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: "db"
+    networks:
+      - insurance_net
+
+  db:
+    image: postgres:16
+    container_name: insurance_postgres
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - insurance_net
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-http://localhost:3000/api/insurance}
+    container_name: insurance_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
+
+
+networks:
+  insurance_net:
+    external: true

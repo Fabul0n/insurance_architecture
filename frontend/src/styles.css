@@ -1,0 +1,155 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+:root {
+  --bg: #f5f7fb;
+  --text: #141b2d;
+  --card-bg: #ffffff;
+  --border: #e2e7ef;
+  --input-border: #cfd8e5;
+  --button-bg: #1366d6;
+  --button-bg-disabled: #90a8cd;
+  --notice-bg: #fdf3d9;
+  --notice-border: #f0ddad;
+  --error: #ad1a1a;
+  --success: #0f7d2e;
+  --link: #0d4fb1;
+}
+
+[data-theme="dark"] {
+  --bg: #101621;
+  --text: #edf2ff;
+  --card-bg: #182130;
+  --border: #2a374d;
+  --input-border: #3a4a63;
+  --button-bg: #3b82f6;
+  --button-bg-disabled: #5c6f92;
+  --notice-bg: #2f2b1d;
+  --notice-border: #635833;
+  --error: #ff8f8f;
+  --success: #8de6a2;
+  --link: #9fc4ff;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--link);
+}
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+input,
+button {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+button {
+  border: none;
+  background: var(--button-bg);
+  color: white;
+}
+
+button:disabled {
+  background: var(--button-bg-disabled);
+}
+
+.notice {
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-border);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.error {
+  color: var(--error);
+}
+
+.success {
+  color: var(--success);
+}
+
+.block,
+.contract {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.application-item {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  display: grid;
+  gap: 6px;
+}
+
+.theme-toggle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.passport-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
