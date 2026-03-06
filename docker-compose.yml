@@ -9,6 +9,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    volumes:
+      - "./logs:/home/python/logs"
     environment:
       DB_HOST: "db"
     networks:

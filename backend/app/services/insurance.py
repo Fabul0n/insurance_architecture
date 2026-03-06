@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.dao.dao import InsuranceApplicationDAO, InsuranceContractDAO, InsurancePaymentDAO, InsuranceUserDAO
+from app.loggers.document_logger import get_document_logger
 from app.schemas.insurance import (
     ApplicationCreateDB,
     ApplicationResponse,
@@ -27,6 +28,9 @@ from app.schemas.insurance import (
 )
 from app.services.auth import hash_password, verify_password
 from db.models import InsuranceApplication, InsuranceContract, InsuranceUser
+
+
+document_logger = get_document_logger()
 
 
 def cases_to_db(cases: list[str]) -> str:
@@ -191,13 +195,21 @@ async def make_payment(
         )
 
     application.status = "paid"
-    await InsuranceContractDAO.create_contract(
+    contract = await InsuranceContractDAO.create_contract(
         session,
         ContractCreateDB(
             user_id=user.id,
             application_id=application.id,
             contract_number=f"INS-{datetime.utcnow():%Y%m%d}-{str(uuid4())[:8].upper()}",
         ),
+    )
+    document_logger.info(
+        "event=%s user_id=%s application_id=%s contract_id=%s contract_number=%s",
+        "contract_created",
+        user.id,
+        application.id,
+        contract.id,
+        contract.contract_number,
     )
     return PaymentResponse(
         payment_id=payment.id,
@@ -298,6 +310,15 @@ def build_contract_docx_from_template(
     out = BytesIO()
     document.save(out)
     out.seek(0)
+
+    document_logger.info(
+        "event=%s contract_id=%s application_id=%s contract_number=%s",
+        "contract_docx_built",
+        contract.id,
+        application.id,
+        contract.contract_number,
+    )
+
     return out.read()
 
 
@@ -344,6 +365,15 @@ def build_contract_pdf_from_template(
 
     doc.build(spaced_story)
     buffer.seek(0)
+
+    document_logger.info(
+        "event=%s contract_id=%s application_id=%s contract_number=%s",
+        "contract_pdf_built",
+        contract.id,
+        application.id,
+        contract.contract_number,
+    )
+
     return buffer.read()
 
 

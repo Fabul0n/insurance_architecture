@@ -6,6 +6,8 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api import insurance
 from app.config import get_settings
+from app.loggers.auth_logger import get_auth_logger
+from app.middleware.auth_logging import AuthLoggingMiddleware
 
 
 app = FastAPI(title="Insurance Service", version="0.1.0")
@@ -14,6 +16,8 @@ settings = get_settings()
 origins = [item.strip() for item in settings.CORS_ORIGINS.split(",") if item.strip()]
 allow_all = len(origins) == 1 and origins[0] == "*"
 
+auth_logger = get_auth_logger()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"] if allow_all else origins,
@@ -21,6 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AuthLoggingMiddleware, logger=auth_logger)
 
 app.include_router(insurance.router, prefix="/api")
 

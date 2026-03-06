@@ -16,6 +16,14 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "*"
     CONTRACT_TEMPLATE_PATH: str = "app/templates/insurance_blank.docx"
     INSURER_FULL_NAME: str = "Урста Всеволод Олегович"
+    AUTH_LOG_DIR: str = "logs"
+    AUTH_LOG_FILENAME: str = "auth.log"
+    AUTH_LOG_MAX_BYTES: int = 5 * 1024 * 1024
+    AUTH_LOG_BACKUP_COUNT: int = 5
+    DOCUMENT_LOG_DIR: str = "logs"
+    DOCUMENT_LOG_FILENAME: str = "documents.log"
+    DOCUMENT_LOG_MAX_BYTES: int = 5 * 1024 * 1024
+    DOCUMENT_LOG_BACKUP_COUNT: int = 5
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 

@@ -1,10 +1,11 @@
 from io import BytesIO
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dao.session_maker import get_session
+from app.loggers.document_logger import get_document_logger
 from app.misc.auth_depends import get_current_user
 from app.schemas.insurance import (
     ApplicationResponse,
@@ -36,6 +37,8 @@ from app.services.insurance import (
     register_user,
 )
 from db.models import InsuranceUser
+
+document_logger = get_document_logger()
 
 router = APIRouter(prefix="/insurance", tags=["insurance"])
 
@@ -146,13 +149,27 @@ async def list_contracts(
 @router.get("/contracts/{contract_id}/download")
 async def download_contract(
     contract_id: int,
+    request: Request,
     format: str = Query(default="pdf", pattern="^(pdf|docx)$"),
     user: InsuranceUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
     contract, application = await get_contract_for_user(session, contract_id, user.id)
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")
+
     if format == "pdf":
         buffer = BytesIO(build_contract_pdf_from_template(contract, application))
+        document_logger.info(
+            "event=%s user_id=%s contract_id=%s application_id=%s format=%s ip=%s user_agent=%s",
+            "contract_download",
+            user.id,
+            contract.id,
+            application.id,
+            "pdf",
+            client_ip,
+            user_agent,
+        )
         return StreamingResponse(
             buffer,
             media_type="application/pdf",
@@ -162,6 +179,16 @@ async def download_contract(
         )
 
     doc_buffer = BytesIO(build_contract_docx_from_template(contract, application))
+    document_logger.info(
+        "event=%s user_id=%s contract_id=%s application_id=%s format=%s ip=%s user_agent=%s",
+            "contract_download",
+            user.id,
+            contract.id,
+            application.id,
+            "docx",
+            client_ip,
+            user_agent,
+        )
     return StreamingResponse(
         doc_buffer,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
